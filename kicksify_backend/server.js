@@ -1,18 +1,18 @@
 // server.js
-
+ 
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const mysql = require("mysql");
 require("dotenv").config();
-
+ 
 const PORT = process.env.PORT || 5000;
 const app = express();
-
+ 
 // Alap middlewares
 app.use(cors());
 app.use(express.json());
-
+ 
 // Adatbázis kapcsolat beállítása
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
@@ -21,7 +21,7 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME || "kicksify",
   port: process.env.DB_PORT || 3306
 });
-
+ 
 // Adatbázis kapcsolódás kezelése
 db.connect(err => {
   if (err) {
@@ -30,10 +30,10 @@ db.connect(err => {
   }
   console.log("✅ Connected to MySQL Database");
 });
-
+ 
 // =============== STATIKUS KÉPEK KISZOLGÁLÁSA ===============
 app.use("/images", express.static(path.join(__dirname, "images")));
-
+ 
 // =============== CIPŐK ENDPOINTOK ===============
 app.get("/api/cipok", (req, res) => {
   let query = `
@@ -46,7 +46,7 @@ app.get("/api/cipok", (req, res) => {
     query += " WHERE c.marka = " + mysql.escape(req.query.marka);
   }
   query += " GROUP BY c.cipo_id";
-
+ 
   db.query(query, (err, results) => {
     if (err) {
       console.error("❌ /api/cipok hiba:", err);
@@ -55,7 +55,7 @@ app.get("/api/cipok", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 app.get("/api/cipok/:id", (req, res) => {
   const cipoId = req.params.id;
   const query = `
@@ -77,7 +77,7 @@ app.get("/api/cipok/:id", (req, res) => {
     res.json(results[0]);
   });
 });
-
+ 
 app.get("/api/cipok/:id/arvaltozas", (req, res) => {
   const cipoId = req.params.id;
   const query = `
@@ -94,7 +94,7 @@ app.get("/api/cipok/:id/arvaltozas", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 app.get("/api/cipok/:id/meretek", (req, res) => {
   const cipoId = req.params.id;
   const query = "SELECT meret FROM meretek WHERE cipo_id = ?";
@@ -106,7 +106,7 @@ app.get("/api/cipok/:id/meretek", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 // =============== EXKLUZÍV CIPŐK ENDPOINTOK ===============
 app.get("/api/exkluziv_cipok", (req, res) => {
   db.query("SELECT * FROM exkluziv_cipok", (err, results) => {
@@ -117,7 +117,7 @@ app.get("/api/exkluziv_cipok", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 app.get("/api/exkluziv_cipok/:id", (req, res) => {
   const exkluzivId = req.params.id;
   db.query("SELECT * FROM exkluziv_cipok WHERE exkluziv_id = ?", [exkluzivId], (err, results) => {
@@ -131,7 +131,7 @@ app.get("/api/exkluziv_cipok/:id", (req, res) => {
     res.json(results[0]);
   });
 });
-
+ 
 app.get("/api/exkluziv_cipok/:id/meretek", (req, res) => {
   const exkluzivId = req.params.id;
   db.query("SELECT meret_id, keszlet FROM exkluziv_cipo_meretek WHERE exkluziv_id = ?", [exkluzivId], (err, results) => {
@@ -142,7 +142,7 @@ app.get("/api/exkluziv_cipok/:id/meretek", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 // =============== KOSÁR ENDPOINTOK ===============
 app.post("/api/kosar", (req, res) => {
   const { felhasznalo_id, cipo_id, meret, darabszam, egysegar } = req.body;
@@ -161,7 +161,7 @@ app.post("/api/kosar", (req, res) => {
     res.json({ success: true, message: "Termék hozzáadva a kosárhoz" });
   });
 });
-
+ 
 app.get("/api/kosar/:felhasznalo_id", (req, res) => {
   const felhasznalo_id = req.params.felhasznalo_id;
   const query = `
@@ -178,7 +178,7 @@ app.get("/api/kosar/:felhasznalo_id", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 app.delete("/api/kosar/:id", (req, res) => {
   const kosarId = req.params.id;
   const query = "DELETE FROM kosar WHERE kosar_id = ?";
@@ -190,7 +190,7 @@ app.delete("/api/kosar/:id", (req, res) => {
     res.json({ success: true, message: "Termék eltávolítva a kosárból" });
   });
 });
-
+ 
 // =============== FELHASZNÁLÓK / AUTH ENDPOINTOK ===============
 app.post("/api/felhasznalok/login", (req, res) => {
   const { email, jelszo_hash } = req.body;
@@ -213,7 +213,7 @@ app.post("/api/felhasznalok/login", (req, res) => {
     res.json({ success: true, user });
   });
 });
-
+ 
 app.post("/api/felhasznalok", (req, res) => {
   const { vezeteknev, keresztnev, felhasznalonev, email, jelszo_hash } = req.body;
   if (!vezeteknev || !keresztnev || !felhasznalonev || !email || !jelszo_hash) {
@@ -231,7 +231,7 @@ app.post("/api/felhasznalok", (req, res) => {
     res.json({ success: true, userId: result.insertId });
   });
 });
-
+ 
 app.put("/api/felhasznalok/:id", (req, res) => {
   const userId = req.params.id;
   const { vezeteknev, keresztnev, email, szerep } = req.body;
@@ -248,7 +248,7 @@ app.put("/api/felhasznalok/:id", (req, res) => {
     res.json({ success: true });
   });
 });
-
+ 
 app.delete("/api/felhasznalok/:id", (req, res) => {
   const userId = req.params.id;
   db.query("DELETE FROM felhasznalok WHERE felhasznalo_id=?", [userId], (err, result) => {
@@ -259,7 +259,7 @@ app.delete("/api/felhasznalok/:id", (req, res) => {
     res.json({ success: true });
   });
 });
-
+ 
 // CIPŐK
 app.get("/api/cipok", (req, res) => {
   db.query("SELECT * FROM cipok", (err, results) => {
@@ -267,7 +267,7 @@ app.get("/api/cipok", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 app.get("/api/cipok/:id", (req, res) => {
   const id = req.params.id;
   db.query("SELECT * FROM cipok WHERE cipo_id=?", [id], (err, rows) => {
@@ -276,7 +276,7 @@ app.get("/api/cipok/:id", (req, res) => {
     res.json(rows[0]);
   });
 });
-
+ 
 app.post("/api/cipok", (req, res) => {
   const { marka, modell, ar, leiras } = req.body;
   const sql = "INSERT INTO cipok (marka, modell, ar, leiras, szin, cikkszam, kep, fizetes_szallitas) VALUES (?,?,?,?,'Fekete','ABC123','default.jpg','Alap szöveg')";
@@ -288,7 +288,7 @@ app.post("/api/cipok", (req, res) => {
     res.json({ success: true, newId: result.insertId });
   });
 });
-
+ 
 app.put("/api/cipok/:id", (req, res) => {
   const id = req.params.id;
   const { marka, modell, ar, leiras } = req.body;
@@ -301,7 +301,7 @@ app.put("/api/cipok/:id", (req, res) => {
     res.json({ success: true });
   });
 });
-
+ 
 app.delete("/api/cipok/:id", (req, res) => {
   const id = req.params.id;
   db.query("DELETE FROM cipok WHERE cipo_id=?", [id], (err, result) => {
@@ -312,7 +312,7 @@ app.delete("/api/cipok/:id", (req, res) => {
     res.json({ success: true });
   });
 });
-
+ 
 // EXKLUZÍV CIPŐK
 app.get("/api/exkluziv_cipok", (req, res) => {
   db.query("SELECT * FROM exkluziv_cipok", (err, results) => {
@@ -320,7 +320,7 @@ app.get("/api/exkluziv_cipok", (req, res) => {
     res.json(results);
   });
 });
-
+ 
 app.get("/api/exkluziv_cipok/:id", (req, res) => {
   const id = req.params.id;
   db.query("SELECT * FROM exkluziv_cipok WHERE exkluziv_id=?", [id], (err, rows) => {
@@ -329,7 +329,7 @@ app.get("/api/exkluziv_cipok/:id", (req, res) => {
     res.json(rows[0]);
   });
 });
-
+ 
 app.post("/api/exkluziv_cipok", (req, res) => {
   const { marka, modell, ar, leiras } = req.body;
   const sql = "INSERT INTO exkluziv_cipok (marka, modell, ar, leiras, szin, cikkszam, kep, fizetes_szallitas) VALUES (?,?,?,?,'Fekete','EX123','default.jpg','Alap szöveg')";
@@ -341,7 +341,7 @@ app.post("/api/exkluziv_cipok", (req, res) => {
     res.json({ success: true, newId: result.insertId });
   });
 });
-
+ 
 app.put("/api/exkluziv_cipok/:id", (req, res) => {
   const id = req.params.id;
   const { marka, modell, ar, leiras } = req.body;
@@ -354,7 +354,7 @@ app.put("/api/exkluziv_cipok/:id", (req, res) => {
     res.json({ success: true });
   });
 });
-
+ 
 app.delete("/api/exkluziv_cipok/:id", (req, res) => {
   const id = req.params.id;
   db.query("DELETE FROM exkluziv_cipok WHERE exkluziv_id=?", [id], (err, result) => {
@@ -365,14 +365,14 @@ app.delete("/api/exkluziv_cipok/:id", (req, res) => {
     res.json({ success: true });
   });
 });
-
+ 
 // =============== STATIKUS FRONTEND KISZOLGÁLÁS ===============
 app.use(express.static(path.join(__dirname, "../kicksify_frontend")));
-
+ 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../kicksify_frontend/index.html"));
 });
-
+ 
 // =============== INDÍTÁS ===============
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);

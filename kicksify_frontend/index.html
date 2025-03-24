@@ -540,23 +540,28 @@
               <p class="mt-3 text-center"><span class="toggle-link" id="cancelEdit">Mégse</span></p>
             </form>
           </div>
-          <!-- Login szekció (ha nincs bejelentkezve) -->
-          <div id="loginSection">
-            <form id="loginForm">
-              <div class="mb-3">
-                <label for="loginEmail" class="form-label">Email</label>
-                <input type="email" class="form-control" id="loginEmail" required>
-              </div>
-              <div class="mb-3">
-                <label for="loginPassword" class="form-label">Jelszó</label>
-                <input type="password" class="form-control" id="loginPassword" required>
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Bejelentkezés</button>
-            </form>
-            <p class="mt-3 text-center">
-              Még nincs fiókod? <span class="toggle-link" id="showRegister">Regisztráció</span>
-            </p>
-          </div>
+         <!-- Login szekció (ha nincs bejelentkezve) -->
+<div id="loginSection">
+  <form id="loginForm">
+    <div class="mb-3">
+      <label for="loginEmail" class="form-label">Email</label>
+      <input type="email" class="form-control" id="loginEmail" required>
+    </div>
+    <div class="mb-3">
+      <label for="loginPassword" class="form-label">Jelszó</label>
+      <input type="password" class="form-control" id="loginPassword" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Bejelentkezés</button>
+  </form>
+  <p class="mt-3 text-center">
+    Még nincs fiókod? <span class="toggle-link" id="showRegister">Regisztráció</span>
+  </p>
+  <!-- Admin link -->
+  <p class="text-center">
+    <a href="admin.html">Admin</a>
+  </p>
+</div>
+
           <!-- Regisztrációs rész -->
           <div id="registerSection">
             <form id="registerForm">
